@@ -15,7 +15,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Switch } from "@/components/ui/switch"
+import { Switch, ThemeToggle } from "@/components/ui/switch"
+import { useTheme } from "next-themes"
 
 const profileFormSchema = z.object({
   displayName: z.string().min(2, { message: "Display name must be at least 2 characters." }),
@@ -32,6 +33,8 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { theme, setTheme } = useTheme();
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
@@ -71,8 +74,8 @@ export default function SettingsPage() {
     <div className="container max-w-4xl mx-auto px-4 py-8">
       <Card className="border border-muted shadow-sm mb-8">
         <CardHeader className="border-b border-muted">
-          <CardTitle className="text-secondary">Settings</CardTitle>
-          <CardDescription>Manage your account settings and preferences</CardDescription>
+          <CardTitle className="text-foreground">Settings</CardTitle>
+          <CardDescription className="text-muted-foreground">Manage your account settings and preferences</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <Tabs defaultValue="profile" className="w-full">
@@ -88,18 +91,6 @@ export default function SettingsPage() {
                 className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary"
               >
                 Account
-              </TabsTrigger>
-              <TabsTrigger
-                value="notifications"
-                className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary"
-              >
-                Notifications
-              </TabsTrigger>
-              <TabsTrigger
-                value="privacy"
-                className="rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary"
-              >
-                Privacy
               </TabsTrigger>
             </TabsList>
 
@@ -226,7 +217,7 @@ export default function SettingsPage() {
             <TabsContent value="account" className="p-6">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium text-secondary mb-4">Account Settings</h3>
+                  <h3 className="text-lg font-medium text-foreground mb-4">Account Settings</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center p-4 border border-muted rounded-md">
                       <div>
@@ -253,97 +244,24 @@ export default function SettingsPage() {
                         Delete Account
                       </Button>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
 
-            <TabsContent value="notifications" className="p-6">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium text-secondary mb-4">Notification Preferences</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border border-muted rounded-md">
-                      <div>
-                        <h4 className="font-medium text-foreground">Email Notifications</h4>
-                        <p className="text-sm text-foreground/70">
-                          Receive email updates about activity related to you
-                        </p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-muted rounded-md">
-                      <div>
-                        <h4 className="font-medium text-foreground">Push Notifications</h4>
-                        <p className="text-sm text-foreground/70">Receive push notifications on your devices</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-muted rounded-md">
-                      <div>
-                        <h4 className="font-medium text-foreground">New Follower Alerts</h4>
-                        <p className="text-sm text-foreground/70">Get notified when someone follows you</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-muted rounded-md">
-                      <div>
-                        <h4 className="font-medium text-foreground">Comment Notifications</h4>
-                        <p className="text-sm text-foreground/70">Get notified when someone comments on your posts</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-muted rounded-md">
-                      <div>
-                        <h4 className="font-medium text-foreground">Like Notifications</h4>
-                        <p className="text-sm text-foreground/70">Get notified when someone likes your posts</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="privacy" className="p-6">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium text-secondary mb-4">Privacy Settings</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border border-muted rounded-md">
+                    <div className="flex justify-between items-center p-4 border border-muted rounded-md">
                       <div>
                         <h4 className="font-medium text-foreground">Private Account</h4>
                         <p className="text-sm text-foreground/70">Only approved followers can see your content</p>
                       </div>
-                      <Switch />
+                      <Switch checked={isPrivate} onCheckedChange={setIsPrivate} />
                     </div>
 
-                    <div className="flex items-center justify-between p-4 border border-muted rounded-md">
+                    <div className="flex justify-between items-center p-4 border border-muted rounded-md">
                       <div>
-                        <h4 className="font-medium text-foreground">Show Activity Status</h4>
-                        <p className="text-sm text-foreground/70">Let others see when you're online</p>
+                        <h4 className="font-medium text-foreground">Theme</h4>
+                        <p className="text-sm text-foreground/70">Switch between light and dark mode</p>
                       </div>
-                      <Switch defaultChecked />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-muted rounded-md">
-                      <div>
-                        <h4 className="font-medium text-foreground">Content Visibility</h4>
-                        <p className="text-sm text-foreground/70">Allow your content to appear on explore page</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-muted rounded-md">
-                      <div>
-                        <h4 className="font-medium text-foreground">Blocked Users</h4>
-                        <p className="text-sm text-foreground/70">Manage users you've blocked</p>
-                      </div>
-                      <Button variant="outline">Manage</Button>
+                      <ThemeToggle
+                        checked={theme === "light"}
+                        onCheckedChange={(checked) => setTheme(checked ? "light" : "dark")}
+                      />
                     </div>
                   </div>
                 </div>

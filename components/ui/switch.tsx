@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import * as SwitchPrimitives from "@radix-ui/react-switch"
+import { useTheme } from "next-themes"
 
 import { cn } from "@/lib/utils"
 
@@ -25,5 +26,60 @@ const Switch = React.forwardRef<
   </SwitchPrimitives.Root>
 ))
 Switch.displayName = SwitchPrimitives.Root.displayName
+
+// ThemeToggle: a rectangular toggle split into 'Dark' and 'Light' sides
+interface ThemeToggleProps {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  className?: string;
+}
+
+export function ThemeToggle({ checked, onCheckedChange, className }: ThemeToggleProps) {
+  const { theme, resolvedTheme } = useTheme();
+  const currentTheme = resolvedTheme || theme;
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      tabIndex={0}
+      className={cn(
+        "flex w-28 h-10 rounded-full border border-muted border-[1px] overflow-hidden transition-colors focus:outline-none focus:ring-2 focus:ring-ring bg-background",
+        className
+      )}
+      onClick={() => onCheckedChange(!checked)}
+      onKeyDown={e => {
+        if (e.key === "Enter" || e.key === " ") onCheckedChange(!checked)
+      }}
+    >
+      <span
+        className={cn(
+          "flex-1 flex items-center justify-center text-sm font-medium transition-colors h-full",
+          checked
+            ? "bg-primary text-primary-foreground shadow-md h-full rounded-l-full"
+            : currentTheme === "dark"
+              ? "bg-white/10 text-white h-full"
+              : "bg-white text-black h-full"
+        )}
+        style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+      >
+        Light
+      </span>
+      <span
+        className={cn(
+          "flex-1 flex items-center justify-center text-sm font-medium transition-colors h-full border-l border-muted",
+          !checked
+            ? "bg-primary text-primary-foreground shadow-md h-full rounded-r-full"
+            : currentTheme === "light"
+              ? "bg-black/10 text-black h-full"
+              : "bg-black text-white h-full"
+        )}
+        style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+      >
+        Dark
+      </span>
+    </button>
+  );
+}
 
 export { Switch }
